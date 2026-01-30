@@ -150,8 +150,6 @@ lines(x=1:29,y=area.m[,1],lwd=2)
 for (i in 2:32)
     lines(x=1:29,y=area.m[,i],col=i,lwd=2)
 
-mylm <- lm(t(area.m) ~ matrix(1:29,32,29,byrow = T))
-car::sp(t(area.m),1:29)
 area.mx <- cbind((area.m),path=1:29)
 require(reshape2)
 areamelt <- melt(area.mx,id.vars = "path")
@@ -160,11 +158,11 @@ plot(areamelt$Var1,areamelt$value)
 mylm <- lm(areamelt$value ~ poly(areamelt$Var1,7))
 
 
-car::sp(areamelt$value ~ areamelt$Var1,ylab="normalized available space",xlab="slice number")
+car::sp(areamelt$value ~ areamelt$Var1,ylab="normalized available space",xlab="slice number",regLine=F)
 library(ggplot2)
 ggplot(areamelt, aes(x = Var1, y = value)) +
   geom_point() +
-  stat_smooth(method = "lm", formula = y ~ poly(x,7), level = 0.95)
+  stat_smooth(method = "lm", formula = y ~ poly(x,7), level = 0.999999999)
 
 require(betareg)
 mybeta <- betareg(areamelt$value ~ areamelt$Var1)
