@@ -5,14 +5,7 @@ scanitNew <- function(sacrum,pubicL,pubicR,mesh,split=100) {
     for (i in 1:nrow(sacrum)) {
         mp <- colMeans(rbind(colMeans(rbind(pubicL[i,],pubicR[i,])),sacrum[i,]))
         midpoints <- rbind(midpoints,mp)
-        
-       # if (i != nrow(x))
         dir <- crossProduct(sacrum[i,]-pubicL[i,],pubicR[i,]-pubicL[i,])
-       ## else
-       ##     dir <- x[i,]-x[i-1,]
-        
-       ## dir <- x[nrow(x),]-x[1,]
-        
         dirs[[i]] <- dir
         tP <- tangentPlane(dir)
         startDir <- mp+tP$y
@@ -65,7 +58,8 @@ getIt <- function(lc=100) {
     return(it)
 }
 
-require(shotGroups)
+if(!require(shotGroups))
+    install.packages("shotGroups")
 elliCyl <- function(x,dir,scale=1,ellscale=1) {
     cAtrafo <- computeTransform(x$xpro3D,cbind(x$xpro2D,0))
     me <- getMinEllipse(x$xpro2D)
