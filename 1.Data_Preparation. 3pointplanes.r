@@ -93,7 +93,7 @@ for (i in 1:nlevels(List$Species)){ # loop to resample sacral landmarks so that 
 sacral.lm<-c(w[i]:122,15)
 resampled.sacral.lm[[i]]<-resampleCurve(Mean.coord[sacral.lm,,MeanPelvesID$Species==levels(List$Species)[i]],15) # matrix of possible interlandmark distances pubis-sacrum for all females in the species
 sum.dist<-dist.1+dist.2 #sum of two distances by individual
-    if(levels(List$Species) != "Hsapiens")
+    if(levels(List$Species)[i] != "Hsapiens")
         w[i]<-distance.1[which.min(apply(sum.dist,2,mean)),2] # identify landmark to use for sac)],15)
     else
         w[i] <- 13
