@@ -41,20 +41,21 @@ saveRDS(scanlist1.1,"scanlist1.1.RDS")
 
 ## Create Ellipses for each slice
 require(DescTools)
-dir.create("Ellipses")
+dir.create("Ellipses",showWarnings=FALSE)
 
 for (k in c("scanlist","scanlist1.1")) {
     arealist <- ellipselist <- list()
     myscans <- get(k) ## replace scanlist with scanlist1.1 for plotting with 10% increased cylinder
+    dir.create(paste0("Ellipses/",k,"/"),showWarnings = FALSE)
     for (use in 1:length(myscans)) {
-        
-        dir.create(paste0("Ellipses/",k,"/"))
+       
         specname <- paste0("Ellipses/",k,"/",lmn[[use]])
         mydims <- vcgKDtree(lms[,,use],lms[,,use],k=32)
         mymax <- max(mydims$distance)*3
         ielistRot <- list()
         myscan <- myscans[[use]]
         mycol <- rainbow(nrow(myscan$midpoints))
+        dir.create(specname,showWarnings = FALSE)
         for (i in 1:nrow(myscan$midpoints)) {
             
             ca <- computeArea(myscan$result[[i]])
@@ -66,15 +67,11 @@ for (k in c("scanlist","scanlist1.1")) {
             myangle <- cangle(c(0,10),sacrum2ca-pubic2ca)
             if (myangle > pi/2)
                 myangle <- -(pi-myangle)
-            
             ## generate rotation matrix
             myrot <- create2Drot(myangle)
+
             ca$xpro2D <- applyTransform(ca$xpro2D,myrot)
-        
             ie <- inscribeEllipse(ca$xpro2D,iters = 2000,maxratio = 1.5)
-            
-            
-            dir.create(specname,showWarnings = FALSE)
             png(paste0(specname,"/",sprintf("%02d.png",i)),width = 1000,height = 1000)
             plot(ca$xpro2D,asp=1,xlim=c(-mymax,mymax),ylim=c(-mymax,mymax))
             lines(rbind(ca$xpro2D,ca$xpro2D[1,]))
@@ -111,7 +108,7 @@ for (k in c("scanlist","scanlist1.1")) {
     for (i in 1:length(ellipselist)) {
         temp <- cbind(centerlist[[i]],ellipsedimlist[[i]])
         colnames(temp) <- c("center.x","center.y","center.z","radius.x","radius.y")
-        specname <- paste0("Ellipses/",names(ellipselist)[[i]])
+        specname <- paste0("Ellipses/",k,"/",names(ellipselist)[[i]])
         openxlsx::write.xlsx(temp,paste0(specname,"/",names(ellipselist)[[i]],"_ellipses.xlsx"))
     }
 }
