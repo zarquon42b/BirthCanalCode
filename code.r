@@ -43,7 +43,7 @@ saveRDS(scanlist1.1,"scanlist1.1.RDS")
 require(DescTools)
 dir.create("Ellipses")
 arealist <- ellipselist <- list()
-myscans <- scanlist1.1
+myscans <- scanlist ## replace scanlist with scanlist1.1 for plotting with 10% increased cylinder
 for (use in 1:length(myscans)) {
     specname <- paste0("Ellipses/",lmn[[use]])
     
@@ -51,7 +51,7 @@ for (use in 1:length(myscans)) {
     mymax <- max(mydims$distance)*3
     ielistRot <- list()
     myscan <- myscans[[use]]
-        
+    mycol <- rainbow(nrow(myscan$midpoints))
     for (i in 1:nrow(myscan$midpoints)) {
         
         ca <- computeArea(myscan$result[[i]])
