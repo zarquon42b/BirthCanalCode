@@ -5,7 +5,7 @@ require(geomorph)
 require(rgl)
 source("./functions.r")
 source("./1.Data_Preparation. 3pointplanes.r")
-lms <- read.morphologika("./3D models pelvis/Pelvis_mean_coords.txt")
+lms <- read.morphologika("Pelvis_mean_coords.txt")
 lmnames <- dimnames(lms)[[3]]
 
 ## load and decimate meshes (only do once!)
@@ -30,7 +30,7 @@ mn <- gsub(".ply","",basename(meshfilesDec))
 scanlist <- parallel::mclapply(1:length(meshfilesDec), workhorse, mc.cores = 8)
 
 ## save to disk
-names(scanlist) <- mn
+names(scanlist) <- lmn
 saveRDS(scanlist,"scanlist.RDS")
 scanlist <- readRDS("./scanlist.RDS")
 scanlist1.1 <- parallel::mclapply(1:length(meshfilesDec), workhorse,ellscale=1.1, mc.cores = 8)
@@ -108,7 +108,7 @@ for (k in c("scanlist","scanlist1.1")) {
     for (i in 1:length(ellipselist)) {
         temp <- cbind(centerlist[[i]],ellipsedimlist[[i]])
         colnames(temp) <- c("center.x","center.y","center.z","radius.x","radius.y")
-        specname <- paste0("Ellipses/",k,"/",names(ellipselist)[[i]])
+        specname <- paste0("Ellipses/",k,"/",names(ellipselist)[i])
         openxlsx::write.xlsx(temp,paste0(specname,"/",names(ellipselist)[[i]],"_ellipses.xlsx"))
     }
 }
