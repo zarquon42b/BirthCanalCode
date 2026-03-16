@@ -36,13 +36,13 @@ scanlist <- readRDS("./scanlist.RDS")
 scanlist1.1 <- parallel::mclapply(1:length(meshfilesDec), workhorse,ellscale=1.1, mc.cores = 8)
 names(scanlist1.1) <- mn
 saveRDS(scanlist1.1,"scanlist1.1.RDS")
-
+scanlist1.1 <- readRDS("./scanlist1.1.RDS")
 
 
 ## Create Ellipses for each slice
 require(DescTools)
 dir.create("Ellipses",showWarnings=FALSE)
-
+maxratio <- 1.93
 for (k in c("scanlist","scanlist1.1")) {
     arealist <- ellipselist <- list()
     myscans <- get(k) ## replace scanlist with scanlist1.1 for plotting with 10% increased cylinder
@@ -71,7 +71,7 @@ for (k in c("scanlist","scanlist1.1")) {
             myrot <- create2Drot(myangle)
 
             ca$xpro2D <- applyTransform(ca$xpro2D,myrot)
-            ie <- inscribeEllipse(ca$xpro2D,iters = 2000,maxratio = 1.5)
+            ie <- inscribeEllipse(ca$xpro2D,iters = 2000,maxratio = maxratio)
             png(paste0(specname,"/",sprintf("%02d.png",i)),width = 1000,height = 1000)
             plot(ca$xpro2D,asp=1,xlim=c(-mymax,mymax),ylim=c(-mymax,mymax))
             lines(rbind(ca$xpro2D,ca$xpro2D[1,]))
