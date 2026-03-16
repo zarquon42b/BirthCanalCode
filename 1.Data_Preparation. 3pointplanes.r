@@ -82,22 +82,23 @@ resampled.sacral.lm<-list(NULL)
 w<-c(NULL)
 
 for (i in 1:nlevels(List$Species)){  # loop to identify sacral landmark for most constraining inlet and build a list of most constraining inlets
-    dist.1<- interlmkdist(Coords_filtered[,,List$Order[List$Species==levels(List$Species)[i]]], distance.1) # matrix of possible interlandmark distances aur-sacrum for all females in the species
-    dist.2<- interlmkdist(Coords_filtered[,,List$Order[List$Species==levels(List$Species)[i]]], distance.2) # matrix of possible interlandmark distances pubis-sacrum for all females in the species
-    sum.dist<-dist.1+dist.2 #sum of two distances by individual
-    w[i]<-distance.1[which.min(apply(sum.dist,2,mean)),2] # identify landmark to use for sacrum for most constraining inlet 
-    
+  dist.1<- interlmkdist(Coords_filtered[,,List$Order[List$Species==levels(List$Species)[i]]], distance.1) # matrix of possible interlandmark distances aur-sacrum for all females in the species
+  dist.2<- interlmkdist(Coords_filtered[,,List$Order[List$Species==levels(List$Species)[i]]], distance.2) # matrix of possible interlandmark distances pubis-sacrum for all females in the species
+  sum.dist<-dist.1+dist.2 #sum of two distances by individual
+  w[i]<-distance.1[which.min(apply(sum.dist,2,mean)),2] # identify landmark to use for sacrum
 }
 
 for (i in 1:nlevels(List$Species)){ # loop to resample sacral landmarks so that we have 15
-sacral.lm<-c(w[i]:122,15)
-resampled.sacral.lm[[i]]<-resampleCurve(Mean.coord[sacral.lm,,MeanPelvesID$Species==levels(List$Species)[i]],15) # matrix of possible interlandmark distances pubis-sacrum for all females in the species
-sum.dist<-dist.1+dist.2 #sum of two distances by individual
-    if(levels(List$Species)[i] != "Hsapiens")
-        w[i]<-distance.1[which.min(apply(sum.dist,2,mean)),2] # identify landmark to use for sac)],15)
-    else
-        w[i] <- 13
-resampled.sacral.lm[[i]]<- rbind(resampled.sacral.lm[[i]],resampled.sacral.lm[[i]][rep(15,each=14),]) # repeats the last sacral landmark another 14 time, to match lm on pubo-ischial curve.
+  if(levels(List$Species)[i] != "Hsapiens"){
+  sacral.lm<-c(w[i]:122,15)
+  resampled.sacral.lm[[i]]<-resampleCurve(Mean.coord[sacral.lm,,MeanPelvesID$Species==levels(List$Species)[i]],15) # resample sacral landmarks
+  resampled.sacral.lm[[i]]<- rbind(resampled.sacral.lm[[i]],resampled.sacral.lm[[i]][rep(15,each=14),]) # repeats the last sacral landmark another 14 time, to match lm on pubo-ischial curve
+  } 
+  else{
+    sacral.lm<-c(13,110:122,15)
+    resampled.sacral.lm[[i]]<-Mean.coord[sacral.lm,,MeanPelvesID$Species==levels(List$Species)[i]] # uses original human landmarks for humans
+    resampled.sacral.lm[[i]]<- rbind(resampled.sacral.lm[[i]],resampled.sacral.lm[[i]][rep(15,each=14),]) # repeats the last sacral landmark another 14 time, to match lm on pubo-ischial curve.  
+  } 
 }
 
 names(resampled.sacral.lm) <- levels(List$Species)
