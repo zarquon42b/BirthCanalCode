@@ -4,7 +4,10 @@ require(mesheR)
 require(geomorph)
 require(rgl)
 source("./functions.r")
-source("./1.Data_Preparation. 3pointplanes.r")
+#source("./1.Data_Preparation. 3pointplanes.r")
+source("./1.1.Data_Preparation.curves.r")
+source("./1.2.Data_Preparation.planes.r")
+
 lms <- read.morphologika("Pelvis_mean_coords.txt")
 lmnames <- dimnames(lms)[[3]]
 
@@ -27,14 +30,14 @@ lmnspec <- name2factor(lmn,which=2,as.factor = F)
 mn <- gsub(".ply","",basename(meshfilesDec))
 
 ### run scan with auto-generated ellipses
-scanlist <- parallel::mclapply(1:length(meshfilesDec), workhorse, mc.cores = 8)
+scanlist <- parallel::mclapply(1:length(lmn), workhorse, mc.cores = 8)
 
 ## save to disk
 names(scanlist) <- lmn
 saveRDS(scanlist,"scanlist.RDS")
 scanlist <- readRDS("./scanlist.RDS")
-scanlist1.1 <- parallel::mclapply(1:length(meshfilesDec), workhorse,ellscale=1.1, mc.cores = 8)
-names(scanlist1.1) <- mn
+scanlist1.1 <- parallel::mclapply(1:length(lmn), workhorse,ellscale=1.1, mc.cores = 8)
+names(scanlist1.1) <- lmn
 saveRDS(scanlist1.1,"scanlist1.1.RDS")
 scanlist1.1 <- readRDS("./scanlist1.1.RDS")
 
@@ -63,10 +66,16 @@ for (k in c("scanlist","scanlist1.1")) {
             trafo <- computeTransform(cbind(ca$xpro2D,0),ca$xpro3D)
             sacrum2ca <- applyTransform(myscan$sacrum[i,],trafo)[,1:2]
             pubic2ca <- applyTransform(myscan$midpub[i,],trafo)[,1:2]
+            
             ## align to sacrum/midpubic axis
+            #if (i > 1) {
             myangle <- cangle(c(0,10),sacrum2ca-pubic2ca)
-            if (myangle > pi/2)
+            print(myangle)
+            if (myangle > pi) {
+                
                 myangle <- -(pi-myangle)
+                
+            }
             ## generate rotation matrix
             myrot <- create2Drot(myangle)
 
@@ -80,7 +89,7 @@ for (k in c("scanlist","scanlist1.1")) {
             lines(c(0,0),c(-100,100))
             dev.off()
             ie$trafo1 <- trafo
-        ie$trafo2 <- myrot
+            ie$trafo2 <- myrot
             ielistRot[[i]] <- ie
             
         }

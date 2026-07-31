@@ -26,7 +26,7 @@ scanitNew <- function(sacrum,pubicL,pubicR,mesh,split=100) {
     return(list(result=result,midpoints=midpoints,dirs=dirs))
 }
 
-getMidline <- function(sacrum,pubicL,pubicR) {
+getMidline <- function(sacrum,pubicL,pubicR=NULL) {
     ## midpointInd <- cbind(c(28,123:135,30),c(29,136:148,31))
     ## midpoint1 <- t(sapply(1:nrow(midpointInd),function(y) colMeans(x[midpointInd[y,],])))
     ## ind2 <- c(13,110:122,15)
@@ -154,10 +154,11 @@ workhorse <- function(use,ellscale=1) {
     x.m <- vcgImport(meshfilesDec[[m.use]])
     
     coord_use <- grep(lmnspec[use],names(resampled.sacral.lm))
-    sacrum <- resampled.sacral.lm[[coord_use]]
-    pubicL <- puboischial.lmL[[coord_use]]
-    pubicR <- puboischial.lmR[[coord_use]]
     
+    sacrum <- resampled.sacral.lm[[coord_use]][path.species[[coord_use]]$path[,1],]
+    pubicL <- ventral.lm[[coord_use]][path.species[[coord_use]]$path[,2],]
+    ## pubicR <- puboischial.lmR[[coord_use]]
+    pubicR <- NULL
     
     midpoints <- getMidline(sacrum,pubicL,pubicR) ## get path through birthcanal
     cyldir <- sacrum[29,]-sacrum[1,] ## get cylinder dir by direction of sacrum
@@ -181,6 +182,6 @@ workhorse <- function(use,ellscale=1) {
     scan1$meshOrig <- x.m
     scan1$mesh <- merged2.m
     scan1$sacrum <- sacrum
-    scan1$midpub <- (pubicL+pubicR)/2
+    scan1$midpub <- pubicL#(pubicL+pubicR)/2
     return(scan1)
 }
