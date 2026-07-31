@@ -1,11 +1,15 @@
-scanitNew <- function(sacrum,pubicL,pubicR,mesh,split=100) {
+scanitNew <- function(sacrum,pubicL,midpoints,mesh,split=100) {
     result <- dirs <- list()
-    midpoints <- NULL
+    ## midpoints <- NULL
 
     for (i in 1:nrow(sacrum)) {
-        mp <- colMeans(rbind(colMeans(rbind(pubicL[i,],pubicR[i,])),sacrum[i,]))
-        midpoints <- rbind(midpoints,mp)
-        dir <- crossProduct(sacrum[i,]-pubicL[i,],pubicR[i,]-pubicL[i,])
+        ##mp <- colMeans(rbind(colMeans(rbind(pubicL[i,],pubicR[i,])),sacrum[i,]))
+        ##midpoints <- rbind(midpoints,mp)
+        mp <- midpoints[i]
+        ##dir <- crossProduct(sacrum[i,]-pubicL[i,],pubicR[i,]-pubicL[i,])
+        if (i < nrow(sacrum))
+            dir <- midpoints[i+1,] - midpoints[i,]
+        ##print(dir)
         dirs[[i]] <- dir
         tP <- tangentPlane(dir)
         startDir <- mp+tP$y
@@ -131,7 +135,10 @@ visualizePath <- function(myscan,planes=T) {
         clear3d()
     wire3d(myscan$meshOrig,col="white")
     spheres3d(myscan$midpoints)
-    
+    spheres3d(myscan$sacrum)
+        spheres3d(myscan$midpub)
+
+
     mycol <- rainbow(nrow(myscan$midpoints))
     for (i in 1:length(myscan$result)) {
         spheres3d(myscan$result[[i]][myscan$hits[[i]],],col=mycol[i])
@@ -154,13 +161,15 @@ workhorse <- function(use,ellscale=1) {
     x.m <- vcgImport(meshfilesDec[[m.use]])
     
     coord_use <- grep(lmnspec[use],names(resampled.sacral.lm))
+    sacrum <- resampled.sacral.lm[[coord_use]]
+    ventral <- ventral.lm[[coord_use]]
+    midpoints <- (sacrum+ventral)/2 ##[path.species[[coord_use]]$path[,1],]
+    ##pubicL <- puboischial.lmL[[coord_use]][path.species[[coord_use]]$path[,2],]
+    ##pubicR <- puboischial.lmR[[coord_use]][path.species[[coord_use]]$path[,2],]
+    #pubicR <- NULL
     
-    sacrum <- resampled.sacral.lm[[coord_use]][path.species[[coord_use]]$path[,1],]
-    pubicL <- ventral.lm[[coord_use]][path.species[[coord_use]]$path[,2],]
-    ## pubicR <- puboischial.lmR[[coord_use]]
-    pubicR <- NULL
+    ##midpoints <- getMidline(sacrum,pubicL,pubicR) ## get path through birthcanal
     
-    midpoints <- getMidline(sacrum,pubicL,pubicR) ## get path through birthcanal
     cyldir <- sacrum[29,]-sacrum[1,] ## get cylinder dir by direction of sacrum
     ##cyldir <- midpoints[29,]-midpoints[1,]
     p2p <- points2plane(lms[c(13, 15:19, 24:43, 52:246),,use],midpoints[1,],cyldir)
@@ -171,8 +180,11 @@ workhorse <- function(use,ellscale=1) {
     merged2.m <- mergeMeshes(x.m,ellicyl)
     
     
-    scan1 <- scanitNew(resampled.sacral.lm[[coord_use]],puboischial.lmL[[coord_use]],puboischial.lmR[[coord_use]],merged2.m)
-    scan2 <- scanitNew(resampled.sacral.lm[[coord_use]],puboischial.lmL[[coord_use]],puboischial.lmR[[coord_use]],x.m)
+    ##scan1 <- scanitNew(resampled.sacral.lm[[coord_use]],puboischial.lmL[[coord_use]],puboischial.lmR[[coord_use]],merged2.m)
+    ##scan2 <- scanitNew(resampled.sacral.lm[[coord_use]],puboischial.lmL[[coord_use]],puboischial.lmR[[coord_use]],x.m)
+
+    scan1 <- scanitNew(sacrum ,ventral, midpoints ,merged2.m)
+    scan2 <- scanitNew(sacrum ,ventral, midpoints ,x.m)
     for (j in 1:length(scan1$result)) {
         clost <- vcgKDtree(scan2$result[[j]],scan1$result[[j]],k=1)
         good <- which(clost$distance < 1e-2)
@@ -182,6 +194,6 @@ workhorse <- function(use,ellscale=1) {
     scan1$meshOrig <- x.m
     scan1$mesh <- merged2.m
     scan1$sacrum <- sacrum
-    scan1$midpub <- pubicL#(pubicL+pubicR)/2
+    scan1$midpub <- ventral#(pubicL+pubicR)/2
     return(scan1)
 }

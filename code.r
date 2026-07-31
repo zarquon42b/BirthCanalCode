@@ -16,9 +16,8 @@ meshfiles <- list.files("./3D models pelvis",full.names=T,pattern=".ply")
 dir.create("./3D models pelvis/DecMeshes/")
 
 for (i in meshfiles) {
-   
-        tmpmesh <- vcgImport(i)
-        tmpmesh <- vcgQEdecim(tmpmesh, tarface=100000)
+    tmpmesh <- vcgImport(i)
+    tmpmesh <- vcgQEdecim(tmpmesh, tarface=100000)
     vcgPlyWrite(tmpmesh,paste0("./3D models pelvis/DecMeshes/",basename(i)))
 }
 
@@ -70,7 +69,7 @@ for (k in c("scanlist","scanlist1.1")) {
             ## align to sacrum/midpubic axis
             #if (i > 1) {
             myangle <- cangle(c(0,10),sacrum2ca-pubic2ca)
-            print(myangle)
+            ## print(myangle)
             if (myangle > pi) {
                 
                 myangle <- -(pi-myangle)
@@ -86,7 +85,7 @@ for (k in c("scanlist","scanlist1.1")) {
             lines(rbind(ca$xpro2D,ca$xpro2D[1,]))
             DrawEllipse(x=ie$center[1],y=ie$center[2],radius.x = ie$radius.x,radius.y = ie$radius.y,col=mycol[i])
             points(applyTransform(rbind(sacrum2ca,pubic2ca),myrot),col=2,pch=19)
-            lines(c(0,0),c(-100,100))
+            ## lines(c(0,0),c(-100,100))
             dev.off()
             ie$trafo1 <- trafo
             ie$trafo2 <- myrot
