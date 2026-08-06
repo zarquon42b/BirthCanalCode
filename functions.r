@@ -161,8 +161,9 @@ workhorse <- function(use,ellscale=1) {
     x.m <- vcgImport(meshfilesDec[[m.use]])
     
     coord_use <- grep(lmnspec[use],names(resampled.sacral.lm))
-    sacrum <- resampled.sacral.lm[[coord_use]]
-    ventral <- ventral.lm[[coord_use]]
+    sacrum <- resampled.sacral.lm[[coord_use]][path.species[[coord_use]]$path[,1],]
+    ventral <- ventral.lm[[coord_use]][path.species[[coord_use]]$path[,2],]
+   
     midpoints <- (sacrum+ventral)/2 ##[path.species[[coord_use]]$path[,1],]
     ##pubicL <- puboischial.lmL[[coord_use]][path.species[[coord_use]]$path[,2],]
     ##pubicR <- puboischial.lmR[[coord_use]][path.species[[coord_use]]$path[,2],]
